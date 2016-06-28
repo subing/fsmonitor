@@ -1,18 +1,18 @@
 package fsmonitor
 
 import (
-	"fmt"
+	"log"
 	"testing"
 	"time"
 )
 
 func echo() error {
-	fmt.Println("echo")
+	log.Print("echo")
 	return nil
 }
 
 func maxPrint() error {
-	fmt.Println("max.txt modifyed")
+	log.Print("max.txt modifyed")
 	return nil
 }
 func TestWatch(t *testing.T) {

@@ -1,8 +1,8 @@
 package fsmonitor
 
 import (
-	"fmt"
 	"github.com/howeyc/fsnotify"
+	"log"
 	"path/filepath"
 )
 
@@ -35,7 +35,7 @@ func Start() error {
 	var err error
 	watcher, err = fsnotify.NewWatcher()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Print(err.Error())
 		return err
 	}
 
@@ -44,7 +44,7 @@ func Start() error {
 		for {
 			select {
 			case ev := <-watcher.Event:
-				fmt.Println("event:", ev)
+				log.Print("event:", ev)
 				if ev.IsModify() && ev.IsAttrib() {
 					ops := fsMonitor.fileOps[filepath.Base(ev.Name)]
 					if ops != nil {
@@ -52,7 +52,7 @@ func Start() error {
 					}
 				}
 			case err := <-watcher.Error:
-				fmt.Println("error:", err)
+				log.Print("error:", err)
 			case <-done:
 				watcher.Close()
 				return
@@ -60,10 +60,10 @@ func Start() error {
 		}
 	}()
 	for _, v := range fsMonitor.path {
-		fmt.Println("path: ", v)
+		log.Print("path: ", v)
 		err = watcher.Watch(v)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Print(err.Error())
 			return err
 		}
 	}
