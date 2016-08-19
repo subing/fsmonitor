@@ -3,6 +3,7 @@ package fsmonitor
 import (
 	"fmt"
 	"github.com/howeyc/fsnotify"
+	"os"
 	"path/filepath"
 )
 
@@ -25,6 +26,23 @@ func AddWatch(path, file string, ops Func) {
 	fsMonitor.fileOps[file] = ops
 }
 
+func AddWatchPath(path string, ops Func) {
+	filepath.Walk(path,
+		func(path string, f os.FileInfo, err error) error {
+			if f == nil {
+				return err
+			}
+			if f.IsDir() {
+				return nil
+			}
+			fmt.Println("path: ", filepath.Dir(path))
+			fmt.Println("filename: ", f.Name())
+			fsMonitor.path = append(fsMonitor.path, filepath.Dir(path))
+			fsMonitor.fileOps[f.Name()] = ops
+			return nil
+		})
+}
+
 func DeleteWatch(path, file string) {
 	watcher.RemoveWatch(path)
 }
@@ -45,7 +63,7 @@ func Start() error {
 			select {
 			case ev := <-watcher.Event:
 				fmt.Println("event:", ev)
-				if ev.IsModify() && ev.IsAttrib() {
+				if ev.IsModify() {
 					ops := fsMonitor.fileOps[filepath.Base(ev.Name)]
 					if ops != nil {
 						ops()
