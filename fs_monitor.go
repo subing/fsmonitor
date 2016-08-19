@@ -3,6 +3,7 @@ package fsmonitor
 import (
 	"fmt"
 	"github.com/howeyc/fsnotify"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -53,7 +54,7 @@ func Start() error {
 	var err error
 	watcher, err = fsnotify.NewWatcher()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Print(err.Error())
 		return err
 	}
 
@@ -70,7 +71,7 @@ func Start() error {
 					}
 				}
 			case err := <-watcher.Error:
-				fmt.Println("error:", err)
+				log.Print("error:", err)
 			case <-done:
 				watcher.Close()
 				return
@@ -78,10 +79,10 @@ func Start() error {
 		}
 	}()
 	for _, v := range fsMonitor.path {
-		fmt.Println("path: ", v)
+		log.Print("path: ", v)
 		err = watcher.Watch(v)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Print(err.Error())
 			return err
 		}
 	}
